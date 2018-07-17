@@ -1,5 +1,7 @@
 package com.ds.mo.engine.glpacman.logic;
 
+import android.graphics.Point;
+
 import com.ds.mo.engine.common.GameObject;
 import com.ds.mo.engine.glpacman.GameScreen;
 
@@ -70,17 +72,24 @@ public class Tile extends GameObject {
     public final static int ACTIVE = 38;
 
     public int id = EMPTY;
-//    public int wallType = -1;
     public boolean legal;           //dictates whether the tile is active or not
     public boolean teleportTile;     //dictates whether the pacman can turn on this tile
 
-    public Tile(float x, float y) {
+    public Point grid;
+
+    /**
+     * Creates a tile at x,y screen position
+     *
+     * @param x the position along the x axis
+     * @param y the position along the y axis
+     */
+    public Tile(float x, float y, Point grid) {
         super(x, y, TILE_WIDTH, TILE_HEIGHT);
         legal = false;
         teleportTile = false;
 
         id = EMPTY;
-//        wallType = -1;
+        this.grid = grid;
     }
 
     @Override

@@ -11,6 +11,7 @@ import com.ds.mo.engine.common.Vector2D;
 import com.ds.mo.engine.framework.GLScreen;
 import com.ds.mo.engine.framework.Game;
 import com.ds.mo.engine.framework.Input.TouchEvent;
+import com.ds.mo.engine.glpacman.logic.Pacman;
 import com.ds.mo.engine.glpacman.logic.Tile;
 import com.ds.mo.engine.glpacman.logic.World;
 
@@ -30,7 +31,7 @@ public class GameScreen extends GLScreen {
     private SpriteBatcher batcher;
     private Vector2D touchPos = new Vector2D();
 
-//    public static int scale = 1;
+    //    public static int scale = 1;
     private World world;
     private Color tileCol;
     private Vector2D center;
@@ -346,23 +347,31 @@ public class GameScreen extends GLScreen {
         }
     }
 
+    private void drawPacman(SpriteBatcher batcher) {
+        /* Draw fluid pac-man */
+        batcher.setColor(Color.YELLOW);
+        TextureRegion keyFrame = Assets.pacman.getKeyFrame(world.pacman.stateTime,
+                Animation.ANIMATION_LOOPING);
+        batcher.drawSprite(world.pacman.pixel.x, world.pacman.pixel.y,
+                Pacman.PACMAN_WIDTH, Pacman.PACMAN_HEIGHT, world.pacman.rotation, keyFrame);
+    }
+
+    private void drawScore(SpriteBatcher batcher) {
+        /* Draw score */
+        // TODO: 17/07/2018 Format position 0000+score
+        batcher.setColor(Color.WHITE);
+        Assets.font.drawText(batcher, "SCORE:" + world.pacman.score,
+                center.x, WORLD_HEIGHT - 350, 8, 8);
+    }
+
     private void drawGame() {
         batcher.beginBatch(Assets.pacSheet);
         drawWorld(batcher);
 //        drawBoarder(batcher);
 //        drawLegal(batcher);
 
-        /* Draw fluid pac-man */
-        batcher.setColor(Color.YELLOW);
-        TextureRegion keyFrame = Assets.pacman.getKeyFrame(world.stateTime,
-                Animation.ANIMATION_LOOPING);
-        batcher.drawSprite(world.pixel.x, world.pixel.y,
-                16, 16, world.rotation, keyFrame);
-
-        /* Draw score */
-        batcher.setColor(Color.WHITE);
-        Assets.font.drawText(batcher, "SCORE:" + world.score,
-                center.x, WORLD_HEIGHT - 350, 8, 8);
+        drawPacman(batcher);
+        drawScore(batcher);
         batcher.endBatch();
     }
 

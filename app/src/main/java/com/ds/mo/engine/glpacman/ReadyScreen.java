@@ -104,6 +104,8 @@ public class ReadyScreen extends GLScreen {
         int len = events.size();
         for (int i = 0; i < len; i++) {
             TouchEvent event = events.get(i);
+            touchPos.set(event.x, event.y);     //0, 0, 2560, 1440
+            camera.touchToWorld(touchPos);      //0, 0, 360, 640
             if (event.type == TouchEvent.TOUCH_UP) {
                 Log.d("GameScreen", "Touch up, loading level!");
                 if (elapsed > TIME_TO_WAIT) {
