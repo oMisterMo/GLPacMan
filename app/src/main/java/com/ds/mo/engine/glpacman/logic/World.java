@@ -40,9 +40,21 @@ public class World {
     private int numDots, numEnergizers;
     private List<Point> allDots;    //When blinky comes off a tile, it knows if it is a dot
     private List<Point> allEnergizers;
+    private final WorldListener listener;
 
-    public World() {
+    public interface WorldListener {
+        void wa();
+
+        void ka();
+
+        void start();
+
+        void die();
+    }
+
+    public World(WorldListener listener) {
         Log.d("World", "Loading world...");
+        this.listener = listener;
         init();
 
         System.out.println("-----------------------------");
@@ -78,7 +90,7 @@ public class World {
         allEnergizers = new ArrayList<>();
         allDots = new ArrayList<>();
 
-        pacman = new Pacman(tiles, allDots, allEnergizers);
+        pacman = new Pacman(tiles, allDots, allEnergizers, listener);
         pacman.setPacmanPos(14, NO_OF_TILES_Y - 26);    //flip y position
         elapsedTime = 0;
 
@@ -137,6 +149,11 @@ public class World {
         }
     }
 
+    /**
+     * Loads the level data from the json object
+     * <p>
+     * This method is called after the completion of the World constructor
+     */
     public void loadLevel() {
         Log.d("World", "Loading level...");
         JSONObject pacWorld = Assets.pacWorld;
@@ -157,10 +174,8 @@ public class World {
             for (int i = 0; i < len; i++) {
                 int x = i % NO_OF_TILES_X;
                 int y = NO_OF_TILES_Y - (i / NO_OF_TILES_X) - 1;
-                //int y = (i / NO_OF_TILES_X);
-//                System.out.println("Y -> "+y);
 
-                //Tiled uses global id to determine the run time id
+                //Tiled uses global id to determine the run time id (so - 1 to get actual id)
                 tiles[y][x].id = worldData[i] - 1;
 
                 //Set active tiles based on id

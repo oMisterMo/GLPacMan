@@ -14,6 +14,7 @@ import com.ds.mo.engine.framework.Input.TouchEvent;
 import com.ds.mo.engine.glpacman.logic.Pacman;
 import com.ds.mo.engine.glpacman.logic.Tile;
 import com.ds.mo.engine.glpacman.logic.World;
+import com.ds.mo.engine.glpacman.logic.World.WorldListener;
 
 import java.util.List;
 
@@ -32,6 +33,7 @@ public class GameScreen extends GLScreen {
     private Vector2D touchPos = new Vector2D();
 
     //    public static int scale = 1;
+    private WorldListener worldListener;
     private World world;
     private Color tileCol;
     private Vector2D center;
@@ -53,7 +55,28 @@ public class GameScreen extends GLScreen {
         camera.zoom = 0.62f;
 
         tileCol = new Color(139 / 255f, 3 / 255f, 12 / 255f, 1f);
-        world = new World();
+        worldListener = new WorldListener() {
+            @Override
+            public void wa() {
+                Assets.playSound(Assets.wa);
+            }
+
+            @Override
+            public void ka() {
+                Assets.playSound(Assets.ka);
+            }
+
+            @Override
+            public void start() {
+
+            }
+
+            @Override
+            public void die() {
+
+            }
+        };
+        world = new World(worldListener);
         world.loadLevel();
 
         Log.d("GameScreen", "End GameScreen constructor...");

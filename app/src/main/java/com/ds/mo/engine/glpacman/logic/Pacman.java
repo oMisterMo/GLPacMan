@@ -5,6 +5,8 @@ import android.util.Log;
 
 import com.ds.mo.engine.common.Color;
 import com.ds.mo.engine.framework.Input;
+import com.ds.mo.engine.glpacman.Assets;
+import com.ds.mo.engine.glpacman.logic.World.WorldListener;
 
 import java.util.List;
 
@@ -38,10 +40,15 @@ public class Pacman {
     private final List<Point> allEnergizers;
     public Color color = new Color(Color.YELLOW);
 
-    public Pacman(Tile[][] tiles, List<Point> allDots, List<Point> allEnergizers) {
+    private boolean wa = true;
+    private final WorldListener listener;
+
+
+    public Pacman(Tile[][] tiles, List<Point> allDots, List<Point> allEnergizers, WorldListener listener) {
         this.tiles = tiles;
         this.allDots = allDots;
         this.allEnergizers = allEnergizers;
+        this.listener = listener;
         init();
         Log.d("Pacman", "pacman constructor finished...");
     }
@@ -69,6 +76,16 @@ public class Pacman {
 //        Assets.pacman.resetAnimation();
     }
 
+    private void playSound(){
+        if(wa){
+//            Assets.wa.play(1);
+            listener.wa();
+        }else{
+//            Assets.ka.play(1);
+            listener.ka();
+        }
+    }
+
     private void updateScore() {
         Tile t = tiles[pacmanTile.y][pacmanTile.x];
         switch (t.id) {
@@ -77,12 +94,16 @@ public class Pacman {
                 if (allDots.contains(t.grid)) {
                     allDots.remove(t.grid);
                 }
+                playSound();
+                wa = !wa;
                 break;
             case Tile.ENERGIZER:
                 score += ENERGIZER_SCORE;
                 if (allEnergizers.contains(t.grid)) {
                     allEnergizers.remove(t.grid);
                 }
+                playSound();
+                wa = !wa;
                 break;
         }
     }

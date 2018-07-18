@@ -70,6 +70,8 @@ public class Assets {
     //Game music
     public static Music music;
     public static Sound waka;
+    public static Sound wa;
+    public static Sound ka;
 
     //Game font
 //    public static Font numbers;
@@ -158,6 +160,8 @@ public class Assets {
 
         //Load SFX
         waka = glGame.getAudio().newSound("sfx/waka_waka.wav");
+        wa = glGame.getAudio().newSound("sfx/wa.wav");
+        ka = glGame.getAudio().newSound("sfx/ka.wav");
         //Load Audio
         music = glGame.getAudio().newMusic("music.mp3");
         music.setLooping(true);
