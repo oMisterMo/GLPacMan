@@ -11,6 +11,7 @@ import com.ds.mo.engine.common.Vector2D;
 import com.ds.mo.engine.framework.GLScreen;
 import com.ds.mo.engine.framework.Game;
 import com.ds.mo.engine.framework.Input.TouchEvent;
+import com.ds.mo.engine.glpacman.logic.Enemy;
 import com.ds.mo.engine.glpacman.logic.Pacman;
 import com.ds.mo.engine.glpacman.logic.Tile;
 import com.ds.mo.engine.glpacman.logic.World;
@@ -78,6 +79,7 @@ public class GameScreen extends GLScreen {
         };
         world = new World(worldListener);
         world.loadLevel();
+        world.loadIntersection();
 
         Log.d("GameScreen", "End GameScreen constructor...");
     }
@@ -379,12 +381,53 @@ public class GameScreen extends GLScreen {
                 Pacman.PACMAN_WIDTH, Pacman.PACMAN_HEIGHT, world.pacman.rotation, keyFrame);
     }
 
+    private void drawGhosts(SpriteBatcher batcher) {
+        //BLINKY
+        batcher.setColor(Color.RED);
+        batcher.drawSprite(world.blinky.pixel.x, world.blinky.pixel.y,
+                Enemy.GHOST_WIDTH, Enemy.GHOST_HEIGHT,
+                Assets.ghost.getKeyFrame(1f, Animation.ANIMATION_LOOPING));
+        batcher.setColor(Color.WHITE);
+        switch (world.blinky.ghostDir) {
+            case UP:
+                batcher.drawSprite(world.blinky.pixel.x, world.blinky.pixel.y,
+                        Enemy.GHOST_WIDTH, Enemy.GHOST_HEIGHT, Assets.eyesU);
+                break;
+            case DOWN:
+                batcher.drawSprite(world.blinky.pixel.x, world.blinky.pixel.y,
+                        Enemy.GHOST_WIDTH, Enemy.GHOST_HEIGHT, Assets.eyesD);
+                break;
+            case LEFT:
+                batcher.drawSprite(world.blinky.pixel.x, world.blinky.pixel.y,
+                        Enemy.GHOST_WIDTH, Enemy.GHOST_HEIGHT, Assets.eyesL);
+                break;
+            case RIGHT:
+                batcher.drawSprite(world.blinky.pixel.x, world.blinky.pixel.y,
+                        Enemy.GHOST_WIDTH, Enemy.GHOST_HEIGHT, Assets.eyesR);
+                break;
+        }
+    }
+
     private void drawScore(SpriteBatcher batcher) {
         /* Draw score */
         // TODO: 17/07/2018 Format position 0000+score
         batcher.setColor(Color.WHITE);
         Assets.font.drawText(batcher, "SCORE:" + world.pacman.score,
                 center.x, WORLD_HEIGHT - 350, 8, 8);
+    }
+
+    private void drawTest(SpriteBatcher batcher) {
+        batcher.setColor(Color.ORANGE);
+        for (int y = 0; y < World.NO_OF_TILES_Y; y++) {
+            for (int x = 0; x < World.NO_OF_TILES_X; x++) {
+                Tile t = world.tiles[y][x];
+                if (t.intersection) {
+                    batcher.drawSprite(t.position.x, t.position.y,
+                            8, 8,
+                            Assets.energizer);
+                }
+            }
+        }
     }
 
     private void drawGame() {
@@ -394,7 +437,9 @@ public class GameScreen extends GLScreen {
 //        drawLegal(batcher);
 
         drawPacman(batcher);
+        drawGhosts(batcher);
         drawScore(batcher);
+//        drawTest(batcher);
         batcher.endBatch();
     }
 

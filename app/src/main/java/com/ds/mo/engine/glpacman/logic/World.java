@@ -28,9 +28,10 @@ public class World {
     public Tile[][] tiles;
 
     //---------------------------------------------------------------------------------------------
-    private static final float TIME_TO_MOVE = 0f;
+    private /*static final*/ float TIME_TO_MOVE = 1f;
 
     public Pacman pacman;
+    public Enemy blinky;
 
     private float elapsedTime;
 
@@ -92,10 +93,15 @@ public class World {
 
         pacman = new Pacman(tiles, allDots, allEnergizers, listener);
         pacman.setPacmanPos(14, NO_OF_TILES_Y - 26);    //flip y position
+
+        blinky = new Blinky(Tile.BLINKY, tiles, pacman, allDots, allEnergizers,
+                14, NO_OF_TILES_Y - 1 - 14);
+        blinky.setInHome(false);
+        // TODO: 18/07/2018 TEST BLINKY
         elapsedTime = 0;
 
-        tiles[18][0].teleportTile = true;
-        tiles[18][NO_OF_TILES_X - 1].teleportTile = true;
+        tiles[World.NO_OF_TILES_Y - 17][0].teleportTile = true;
+        tiles[World.NO_OF_TILES_Y - 17][NO_OF_TILES_X - 1].teleportTile = true;
     }
 
     /**
@@ -263,6 +269,41 @@ public class World {
 //        }
     }
 
+    public void loadIntersection() {
+        Log.d("World", "Loading intersection...");
+        JSONObject pacWorld = Assets.pacIntersection;
+        try {
+            Log.d("Object", "******************************************************************");
+            //Get data from JSON file
+            JSONArray data = pacWorld.getJSONArray("layers").getJSONObject(0)
+                    .getJSONArray("data");
+            Log.d("World", data.toString());
+            //Load world data into an array
+            int len = data.length();
+            Log.d("World", "data.length() -> " + len);
+            int[] worldData = new int[len];
+            for (int i = 0; i < len; i++) {
+                worldData[i] = (int) data.get(i);
+            }
+            //Init tiles based on id
+            for (int i = 0; i < len; i++) {
+                int x = i % NO_OF_TILES_X;
+                int y = NO_OF_TILES_Y - (i / NO_OF_TILES_X) - 1;
+
+                //Tiled uses global id to determine the run time id (so - 1 to get actual id)
+
+                int id = worldData[i] - 1;
+                if (id == Tile.INTERSECTION) {
+                    tiles[y][x].intersection = true;
+                }
+            }
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void printTiles() {
         for (int y = 0; y < NO_OF_TILES_Y; y++) {
             for (int x = 0; x < NO_OF_TILES_X; x++) {
@@ -312,21 +353,12 @@ public class World {
         }
     }
 
-    //---------------------------------------------------------------------------------------------
-//    private void updateScore() {
-//        Tile t = tiles[pacmanTile.y][pacmanTile.x];
-//        switch (t.id) {
-//            case Tile.DOT:
-////                System.out.println("FOOD!");
-//                Assets.playSound(Assets.waka);
-//                score += FOOD_SCORE;
-//                break;
-//            case Tile.ENERGIZER:
-////                System.out.println("Energizer!");
-//                score += ENERGIZER_SCORE;
-//                break;
-//        }
-//    }
+    private void updatePacman(float deltaTime){
+        pacman.update(deltaTime);
+    }
+    private void updateGhosts(float deltaTime){
+        blinky.update(deltaTime);
+    }
 
     public void update(float deltaTime) {
         /*slow down pacman*/
@@ -334,7 +366,8 @@ public class World {
         if (elapsedTime >= TIME_TO_MOVE) {
 //            System.out.println("move");
 //            movePacman(deltaTime);
-            pacman.update(deltaTime);
+            updatePacman(deltaTime);
+            updateGhosts(deltaTime);
             elapsedTime = 0;
         }
     }

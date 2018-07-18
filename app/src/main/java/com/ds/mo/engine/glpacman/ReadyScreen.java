@@ -17,7 +17,8 @@ import java.util.List;
 import javax.microedition.khronos.opengles.GL10;
 
 public class ReadyScreen extends GLScreen {
-    private static final float TIME_TO_WAIT = 6f;
+    private static final float TIME_TO_WAIT = 0f;
+//    private static final float TIME_TO_WAIT = 6f;
     private static final float QUICK_PULSE = 0.2f;
     private static final float PULSE = 1f;
 

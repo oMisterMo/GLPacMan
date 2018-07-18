@@ -21,6 +21,7 @@ public class DrawActivity extends GLGame {
     public Screen getStartScreen() {
         Log.d("DrawActivity", "new ReadyScreen()...");
         return new ReadyScreen(this);
+//        return new GameScreen(this);
     }
 
     @Override

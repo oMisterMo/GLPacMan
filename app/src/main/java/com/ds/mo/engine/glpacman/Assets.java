@@ -79,6 +79,7 @@ public class Assets {
 
     //World file
     public static JSONObject pacWorld;
+    public static JSONObject pacIntersection;
 
     public static void load(GLGame glGame) {
         Log.d("Assets", "Loading assets...");
@@ -149,12 +150,19 @@ public class Assets {
 
         //Load world map
         Log.d("Assets", "trying to load json file...");
-        String world = loadJson(glGame);
+        String world = loadJson(glGame, "pacworld.json");
         try {
 //            glGame.getFileIO().readAsset("pacworld.json");
             pacWorld = new JSONObject(world);
-            Log.d("Assets", "json loaded...");
+            Log.d("Assets", "pacman WORLD json loaded...");
         } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        String intersection = loadJson(glGame, "pacmanIntersection.json");
+        try {
+            pacIntersection = new JSONObject(intersection);
+            Log.d("Assets", "pacman INTERSECTION json loaded...");
+        } catch (JSONException e){
             e.printStackTrace();
         }
 
@@ -190,10 +198,10 @@ public class Assets {
         }
     }
 
-    private static String loadJson(Context context) {
+    private static String loadJson(Context context, String fileName) {
         String json = null;
         try {
-            InputStream is = context.getAssets().open("pacworld.json");
+            InputStream is = context.getAssets().open(fileName);
             int size = is.available();
             byte[] buffer = new byte[size];
             is.read(buffer);

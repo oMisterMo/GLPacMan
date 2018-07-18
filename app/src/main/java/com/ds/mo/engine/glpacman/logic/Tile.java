@@ -70,10 +70,13 @@ public class Tile extends GameObject {
     public final static int HOME_DOOR = 36;      //door to enemies home
     public final static int PACMAN = 37;
     public final static int ACTIVE = 38;
+    public final static int INTERSECTION = 39;
+    public final static int BLINKY = 40;
 
     public int id = EMPTY;
     public boolean legal;           //dictates whether the tile is active or not
     public boolean teleportTile;     //dictates whether the pacman can turn on this tile
+    public boolean intersection;
 
     public Point grid;
 
@@ -87,6 +90,7 @@ public class Tile extends GameObject {
         super(x, y, TILE_WIDTH, TILE_HEIGHT);
         legal = false;
         teleportTile = false;
+        intersection = false;
 
         id = EMPTY;
         this.grid = grid;
