@@ -72,11 +72,16 @@ public class Tile extends GameObject {
     public final static int ACTIVE = 38;
     public final static int INTERSECTION = 39;
     public final static int BLINKY = 40;
+    public final static int PINKY = 41;
+    public final static int INKY = 42;
+    public final static int CLYDE = 43;
 
     public int id = EMPTY;
     public boolean legal;           //dictates whether the tile is active or not
     public boolean teleportTile;     //dictates whether the pacman can turn on this tile
     public boolean intersection;
+
+    public boolean special;
 
     public Point grid;
 
@@ -91,6 +96,7 @@ public class Tile extends GameObject {
         legal = false;
         teleportTile = false;
         intersection = false;
+        special = false;
 
         id = EMPTY;
         this.grid = grid;

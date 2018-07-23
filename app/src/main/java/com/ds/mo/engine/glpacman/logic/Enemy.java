@@ -5,6 +5,7 @@ import android.graphics.Point;
 import com.ds.mo.engine.common.Color;
 import com.ds.mo.engine.common.Helper;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +24,8 @@ public class Enemy {
     //Blinky target tile: Tile t = tiles[0][World.NO_OF_TILES_X-6];
     public static final Point blinkyScatter = new Point(World.NO_OF_TILES_X - 3, World.NO_OF_TILES_Y - 1 - 0);
     public static final Point pinkyScatter = new Point(2, World.NO_OF_TILES_Y - 1 - 0);
-    public static final Point inkyScatter = new Point(World.NO_OF_TILES_X - 1, World.NO_OF_TILES_Y - 1 - World.NO_OF_TILES_Y - 1);
-    public static final Point clydeScatter = new Point(0, World.NO_OF_TILES_Y - 1 - World.NO_OF_TILES_Y - 1);
+    public static final Point inkyScatter = new Point(World.NO_OF_TILES_X - 1, 0);
+    public static final Point clydeScatter = new Point(0, 0);
 
     //-------------------------FROM BLINKY----------------------------------
     public static final int GHOST_WIDTH = 16;
@@ -88,11 +89,11 @@ public class Enemy {
         inHome = true;  //All ghost start in home except blinky
         elapsedTime = 0;
         timeToLeave = 0;
-        initExtra();
+        initHomePath();
         System.out.println("enemy constructor finished...");
     }
 
-    private void initExtra() {
+    private void initHomePath() {
         t1 = tiles[World.NO_OF_TILES_Y - 1 - 17][12];
         t2 = tiles[World.NO_OF_TILES_Y - 1 - 17][14];
         t3 = tiles[World.NO_OF_TILES_Y - 1 - 14][14];
@@ -336,6 +337,44 @@ public class Enemy {
 //        setNextMove(d);
     }
 
+    public void setRandomDir(Tile tile) {
+        // TODO: 20/07/2018 could probably optimize method
+        Map<Direction, Tile> adjacent = new HashMap<>();
+        //Add tiles: up, left, down, right (if legal)
+        if (isTileWithinWorld(tile.grid.x, tile.grid.y + 1)) {
+            Tile up = tiles[tile.grid.y + 1][tile.grid.x];
+            if (up.legal) {
+                adjacent.put(Direction.UP, up);
+            }
+        }
+        if (isTileWithinWorld(tile.grid.x - 1, tile.grid.y)) {
+            Tile left = tiles[tile.grid.y][tile.grid.x - 1];
+            if (left.legal) {
+                adjacent.put(Direction.LEFT, left);
+            }
+        }
+        if (isTileWithinWorld(tile.grid.x, tile.grid.y - 1)) {
+            Tile down = tiles[tile.grid.y - 1][tile.grid.x];
+            if (down.legal) {
+                adjacent.put(Direction.DOWN, down);
+            }
+        }
+        if (isTileWithinWorld(tile.grid.x + 1, tile.grid.y)) {
+            Tile right = tiles[tile.grid.y][tile.grid.x + 1];
+            if (right.legal) {
+                adjacent.put(Direction.RIGHT, right);
+            }
+        }
+        //Get a random tile and set the direction to travel
+        for (Map.Entry<Direction, Tile> e : adjacent.entrySet()) {
+            Direction testDir = e.getKey();
+//            Tile testTile = e.getValue();
+//            toTravel = testDir;   //sets only toTravel dir
+            setDir(testDir);        //sets both currentDir + toTravel
+            setNextMove(testDir);
+        }
+    }
+
     public boolean isTileWithinWorld(int x, int y) {
         return (y < World.NO_OF_TILES_Y && y >= 0 && x < World.NO_OF_TILES_X && x >= 0);
     }
@@ -363,6 +402,7 @@ public class Enemy {
 
     /* Gets legal adjacent tiles */     //Why pass in current???
     public Map<Direction, Tile> getAdjacent(Tile tile, Direction current) {
+        // TODO: 20/07/2018 new LinkedHashMap??? every time
         //To break the tie, the ghost prefers directions in this order: up, left, down, right.
         //Was using HASHSET but order of insertion was not preserved.
         Map<Direction, Tile> adjacent = new LinkedHashMap<>();
@@ -406,7 +446,7 @@ public class Enemy {
     }
 
     //Test handle new movement
-    public void movePixelUp2() {
+    public void movePixelUp() {
 //        System.out.println("up...");
         Tile current = pixelToTile(pixel.x, pixel.y);
         Point c = getCenter(current);
@@ -434,7 +474,7 @@ public class Enemy {
         }
     }
 
-    public void movePixelRight2() {
+    public void movePixelRight() {
 //        System.out.println("right...");
         Tile current = pixelToTile(pixel.x, pixel.y);
 
@@ -470,15 +510,15 @@ public class Enemy {
 //            System.out.println("--------------------");
             moveRight();
             //Don't get direction if on special tile
-            if (next == tiles[World.NO_OF_TILES_Y - 14][11] ||
-                    next == tiles[World.NO_OF_TILES_Y - 14][14]) {
+            if (next == tiles[World.NO_OF_TILES_Y - 1 - 14][11] ||
+                    next == tiles[World.NO_OF_TILES_Y - 1 - 14][14]) {
                 return;
             }
             setNextMove(Direction.RIGHT);
         }
     }
 
-    public void movePixelDown2() {
+    public void movePixelDown() {
 //        System.out.println("down...");
         Tile current = pixelToTile(pixel.x, pixel.y);
 
@@ -506,7 +546,7 @@ public class Enemy {
         }
     }
 
-    public void movePixelLeft2() {
+    public void movePixelLeft() {
 //        System.out.println("left...");
         Tile current = pixelToTile(pixel.x, pixel.y);
         //-------------------Wrap Player------------------------
@@ -539,8 +579,8 @@ public class Enemy {
         //Just entered a new tile
         if (next.position != current.position) {
             moveLeft();
-            if (next == tiles[World.NO_OF_TILES_Y - 14][13] ||
-                    next == tiles[World.NO_OF_TILES_Y - 14][16]) {
+            if (next == tiles[World.NO_OF_TILES_Y - 1 - 14][13] ||
+                    next == tiles[World.NO_OF_TILES_Y - 1 - 14][16]) {
                 return;
             }
             setNextMove(Direction.LEFT);
@@ -565,7 +605,7 @@ public class Enemy {
         }
         //Get adjacent tiles of next tile
         Map<Direction, Tile> adj = getAdjacent(test, ghostDir);
-        //If theres only a single adjacent tile -> carry on up
+        //If there's only a single adjacent tile -> carry on up
         if (adj.size() == 1) {
             //If blinky reached a corner, set new direction else continue
             for (Map.Entry<Direction, Tile> e : adj.entrySet()) {
@@ -657,9 +697,10 @@ public class Enemy {
         }
     }
 
-    //    //Swtich to custom state
-//    public void switchState(int state) {
-//        Blinky.state = state;
+//        //Swtich to custom state
+//    public void setState(int state) {
+//        this.state = state;
+//        this.enemyStateTime = 0;
 //        switchDir();
 //    }
 
@@ -678,16 +719,16 @@ public class Enemy {
     private void moveEnemy() {
         switch (ghostDir) {
             case UP:
-                movePixelUp2();
+                movePixelUp();
                 break;
             case DOWN:
-                movePixelDown2();
+                movePixelDown();
                 break;
             case LEFT:
-                movePixelLeft2();
+                movePixelLeft();
                 break;
             case RIGHT:
-                movePixelRight2();
+                movePixelRight();
                 break;
         }
     }
@@ -750,27 +791,25 @@ public class Enemy {
         //Check if ghost is in home first -> Handle home shit
         if (inHome) {
             // TODO: 18/07/2018 fix me later
-//            elapsedTime += deltaTime;
-////            System.out.println("elapsedTime: " + elapsedTime);
-//            //Move up and down until its time to come out
-//
-//            if (elapsedTime >= timeToLeave) {
-//                //Come out of home
-//                travelOutside();
-//
-//            } else {
-//                //Bounce up and down
-////                System.out.println("bounce");
-//                pixel.y += bounce;
-//                if (pixel.y <= World.NO_OF_TILES_Y - 17 * Tile.TILE_HEIGHT) {
-//                    //go down
-//                    bounce *= -1;
-//                } else if (pixel.y >= ( World.NO_OF_TILES_Y - 17 * Tile.TILE_HEIGHT) + 7) {
-//                    //go up
-//                    bounce *= -1;
-//                }
-//            }
+            elapsedTime += deltaTime;
+//            System.out.println("elapsedTime: " + elapsedTime);
+            //Move up and down until its time to come out
 
+            if (elapsedTime >= timeToLeave) {
+                //Come out of home
+                travelOutside();
+
+            } else {
+                //Bounce up and down
+//                System.out.println("bounce");
+                pixel.y += bounce;
+                if (pixel.y <= (World.NO_OF_TILES_Y - 1 - 17) * Tile.TILE_HEIGHT) {
+                    bounce *= -1;
+                } else if (pixel.y >= ((World.NO_OF_TILES_Y - 1 - 17) * Tile.TILE_HEIGHT) + 7) {
+                    bounce *= -1;
+                }
+            }
+            enemyStateTime += deltaTime;    //update animation even when in home
         } else {
             //Now the ghost has escaped
             switch (state) {
@@ -783,8 +822,4 @@ public class Enemy {
             }
         }
     }
-
-//    public void draw(Graphics2D g) {
-//        //Over ridden
-//    }
 }

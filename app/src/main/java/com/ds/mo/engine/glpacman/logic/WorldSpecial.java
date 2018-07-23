@@ -6,11 +6,8 @@ import android.util.Log;
 import com.ds.mo.engine.common.Color;
 import com.ds.mo.engine.common.Helper;
 import com.ds.mo.engine.common.Vector2D;
-import com.ds.mo.engine.framework.Input;
 import com.ds.mo.engine.framework.Input.TouchEvent;
 import com.ds.mo.engine.glpacman.Assets;
-import com.ds.mo.engine.glpacman.GameScreen;
-import com.ds.mo.engine.glpacman.ReadyScreen;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,7 +16,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class World {
+public class WorldSpecial {
 
     //Size of the original pacman arcade world
     public static final float WORLD_WIDTH = 224;
@@ -43,6 +40,7 @@ public class World {
     private static final float READY_TIME = 3f;         //Time (seconds) during the ready screen
     public static final float DEATH_WAIT = 1f;          //seconds to wait after death
     private /*static final*/ float TIME_TO_MOVE = 0f;
+//    private /*static final*/ float TIME_TO_MOVE = 1f;
 
     public Pacman pacman;
     public Enemy blinky;
@@ -60,6 +58,7 @@ public class World {
     private int numDots, numEnergizers;
     private List<Point> allDots;    //When blinky comes off a tile, it knows if it is a dot
     private List<Point> allEnergizers;
+    private List<Point> special;
     private final WorldListener listener;
 
     public interface WorldListener {
@@ -72,7 +71,7 @@ public class World {
         void death();
     }
 
-    public World(WorldListener listener) {
+    public WorldSpecial(WorldListener listener) {
         Log.d("World", "Loading world...");
         this.listener = listener;
         init();
@@ -113,11 +112,12 @@ public class World {
         numEnergizers = 0;
         allEnergizers = new ArrayList<>();
         allDots = new ArrayList<>();
+        special = new ArrayList<>();
         specialEnemies = new ArrayList<>();
 
         //set pacman
-        pacman = new Pacman(tiles, allDots, allEnergizers, listener);
-        pacman.setPacmanPos(14, NO_OF_TILES_Y - 1 - 26);    //inverse y position
+//        pacman = new Pacman(tiles, allDots, allEnergizers, listener);
+//        pacman.setPacmanPos(14, NO_OF_TILES_Y - 1 - 26);    //inverse y position
         //set blinky
         blinky = new Blinky(Tile.BLINKY, tiles, pacman, allDots, allEnergizers,
                 14, NO_OF_TILES_Y - 1 - 14);
@@ -143,8 +143,8 @@ public class World {
         stateTime = 0;
         elapsedTime = 0;
 
-        tiles[World.NO_OF_TILES_Y - 1 - 17][0].teleportTile = true;
-        tiles[World.NO_OF_TILES_Y - 1 - 17][NO_OF_TILES_X - 1].teleportTile = true;
+        tiles[WorldSpecial.NO_OF_TILES_Y - 1 - 17][0].teleportTile = true;
+        tiles[WorldSpecial.NO_OF_TILES_Y - 1 - 17][NO_OF_TILES_X - 1].teleportTile = true;
     }
 
     /**
@@ -240,6 +240,7 @@ public class World {
                     //Make a few special tiles (must be a dot)
                     float num = Helper.Random();
                     if (num < 0.04) {
+                        special.add(new Point(x, y));
                         tiles[y][x].special = true;
                     }
                 }
@@ -376,6 +377,18 @@ public class World {
 //        return false;
     }
 
+    private boolean hitSpecial() {
+        for (int i = special.size() - 1; i >= 0; i--) {
+            Point p = special.get(i);
+            if (pacman.pacmanTile.equals(p.x, p.y)) {
+                //remove special tile from list of special since its a ghost now
+                special.remove(p);
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean hitEnergizer() {
         // TODO: 20/07/2018 refactor hitEnergizer and create hitDots
         for (int i = allEnergizers.size() - 1; i >= 0; i--) {
@@ -388,6 +401,32 @@ public class World {
             }
         }
         return false;
+    }
+
+    private void spawnRandomEnemy() {
+        Enemy e = new Clyde(Tile.CLYDE, tiles, pacman, allDots, allEnergizers,
+                pacman.pacmanTile.x, pacman.pacmanTile.y);
+        e.setInHome(false);
+        e.setRandomDir(tiles[pacman.pacmanTile.y][pacman.pacmanTile.x]);
+        int num = Helper.Random(0, 3);
+        switch (num) {
+            case 0:
+                e.color = new Color(Color.RED);
+                break;
+            case 1:
+                e.color = new Color(1, 185 / 255f, 1, 1);
+                break;
+            case 2:
+                e.color = new Color(0, 1, 1, 1);
+                break;
+            case 3:
+                e.color = new Color(1, 185 / 255f, 80 / 255f, 1);
+                break;
+
+        }
+//                e.setDir(pacman);
+
+        specialEnemies.add(e);
     }
 
     private void reset() {
@@ -418,14 +457,14 @@ public class World {
     public void move(List<TouchEvent> events) {
         int len = events.size();
         for (int i = 0; i < len; i++) {
-            Input.TouchEvent event = events.get(i);
-            if (event.type == Input.TouchEvent.TOUCH_DOWN) {
+            TouchEvent event = events.get(i);
+            if (event.type == TouchEvent.TOUCH_DOWN) {
                 initial.set(event.x, event.y);
             }
-            if (event.type == Input.TouchEvent.TOUCH_DRAGGED) {
+            if (event.type == TouchEvent.TOUCH_DRAGGED) {
 
             }
-            if (event.type == Input.TouchEvent.TOUCH_UP) {
+            if (event.type == TouchEvent.TOUCH_UP) {
                 float finalX = event.x;
                 float finalY = event.y;
                 float dx = finalX - initial.x;
@@ -480,6 +519,11 @@ public class World {
     }
 
     private void handleCollision() {
+//        if (hitSpecial()) {
+//            System.out.println("HIT SPECIAL DOT");
+//            spawnRandomEnemy();
+//        }
+
         if (hitEnergizer()) {
             specialEnemies.clear();
 //            setBack();
@@ -503,6 +547,9 @@ public class World {
         }
 
         //Update
+//        for (Enemy e : specialEnemies) {
+//            e.update(deltaTime);
+//        }
 
         /*slow down pacman*/
         elapsedTime += deltaTime;   //in seconds

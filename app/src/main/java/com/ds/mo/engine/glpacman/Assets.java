@@ -28,6 +28,7 @@ public class Assets {
 
     //Active tiles
     public static Animation pacman;
+    public static Animation pacmanDeath;
     public static TextureRegion dot;
     public static TextureRegion energizer;
     public static Animation ghost;
@@ -72,6 +73,7 @@ public class Assets {
     public static Sound waka;
     public static Sound wa;
     public static Sound ka;
+    public static Sound deathSfx;
 
     //Game font
 //    public static Font numbers;
@@ -94,6 +96,18 @@ public class Assets {
                 new TextureRegion(pacSheet, 32 * 3, 0, 32, 32),
                 new TextureRegion(pacSheet, 32 * 4, 0, 32, 32),
                 new TextureRegion(pacSheet, 32 * 3, 0, 32, 32));
+        pacmanDeath = new Animation(0.1f,
+                new TextureRegion(pacSheet, 32 * 2, 32 * 2, 32, 32),
+                new TextureRegion(pacSheet, 32 * 3, 32 * 2, 32, 32),
+                new TextureRegion(pacSheet, 32 * 4, 32 * 2, 32, 32),
+                new TextureRegion(pacSheet, 32 * 5, 32 * 2, 32, 32),
+                new TextureRegion(pacSheet, 32 * 6, 32 * 2, 32, 32),
+                new TextureRegion(pacSheet, 32 * 7, 32 * 2, 32, 32),
+                new TextureRegion(pacSheet, 32 * 8, 32 * 2, 32, 32),
+                new TextureRegion(pacSheet, 32 * 9, 32 * 2, 32, 32),
+                new TextureRegion(pacSheet, 32 * 10, 32 * 2, 32, 32),
+                new TextureRegion(pacSheet, 32 * 11, 32 * 2, 32, 32),
+                new TextureRegion(pacSheet, 32 * 12, 32 * 2, 32, 32));
         dot = new TextureRegion(pacSheet, 8 * 6, 8 * 4, 8, 8);
         energizer = new TextureRegion(pacSheet, 8 * 7, 8 * 4, 8, 8);
         ghost = new Animation(0.1f,
@@ -170,6 +184,7 @@ public class Assets {
         waka = glGame.getAudio().newSound("sfx/waka_waka.wav");
         wa = glGame.getAudio().newSound("sfx/wa.wav");
         ka = glGame.getAudio().newSound("sfx/ka.wav");
+        deathSfx = glGame.getAudio().newSound("sfx/deathSfx.wav");
         //Load Audio
         music = glGame.getAudio().newMusic("music.mp3");
         music.setLooping(true);

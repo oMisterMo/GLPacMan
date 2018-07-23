@@ -16,6 +16,7 @@ public class Pacman {
     public static final int PACMAN_WIDTH = 16;
     public static final int PACMAN_HEIGHT = 16;
 
+    private final WorldListener listener;
     private final Tile[][] tiles;
 
     public enum DIR {
@@ -38,10 +39,11 @@ public class Pacman {
     //Reference to the location of all pellets in the world
     private final List<Point> allDots;
     private final List<Point> allEnergizers;
-    public Color color = new Color(Color.YELLOW);
+    public int dotsEaten;
+    public int energizersEaten;
 
     private boolean wa = true;
-    private final WorldListener listener;
+    public Color color = new Color(Color.YELLOW);
 
 
     public Pacman(Tile[][] tiles, List<Point> allDots, List<Point> allEnergizers, WorldListener listener) {
@@ -62,6 +64,8 @@ public class Pacman {
         Log.d("Pacman", "pacman's direction = " + pacmanDir);
 
         score = 0;
+        dotsEaten = 0;
+        energizersEaten = 0;
     }
 
     public void setPacmanPos(int x, int y) {
@@ -73,14 +77,16 @@ public class Pacman {
         this.pacmanDir = DIR.STOP;
         this.turnBuffer = DIR.NA;
         this.recentDir = DIR.STOP;
+
+        this.stateTime = 0;     //resets the animation
 //        Assets.pacman.resetAnimation();
     }
 
-    private void playSound(){
-        if(wa){
+    private void playSound() {
+        if (wa) {
 //            Assets.wa.play(1);
             listener.wa();
-        }else{
+        } else {
 //            Assets.ka.play(1);
             listener.ka();
         }
@@ -91,6 +97,7 @@ public class Pacman {
         switch (t.id) {
             case Tile.DOT:
                 score += FOOD_SCORE;
+                dotsEaten++;
                 if (allDots.contains(t.grid)) {
                     allDots.remove(t.grid);
                 }
@@ -98,10 +105,11 @@ public class Pacman {
                 wa = !wa;
                 break;
             case Tile.ENERGIZER:
-                score += ENERGIZER_SCORE;
-                if (allEnergizers.contains(t.grid)) {
-                    allEnergizers.remove(t.grid);
-                }
+//                score += ENERGIZER_SCORE;
+//                energizersEaten++;
+//                if (allEnergizers.contains(t.grid)) {
+//                    allEnergizers.remove(t.grid);
+//                }
                 playSound();
                 wa = !wa;
                 break;
